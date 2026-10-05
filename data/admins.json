@@ -1,0 +1,16 @@
+{
+  "owner": {
+    "active": true,
+    "codeHash": "a33413e73b21ccf3710cc9dfeb4b0d0146604bdb932d1ca344aa0d35064e480a"
+  },
+  "admin2": {
+    "active": false,
+    "codeHash": null,
+    "lastGeneratedAt": null
+  },
+  "admin3": {
+    "active": true,
+    "codeHash": "e2e7329747485af91e4ecadfa485956da7320442230305d27b1dfd65ed6d2ac1",
+    "lastGeneratedAt": "2026-10-05T13:28:29.208Z"
+  }
+}

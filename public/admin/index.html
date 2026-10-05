@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>NEXORA — Studio</title>
+<link rel="stylesheet" href="/assets/css/admin.css">
+</head>
+
+<body>
+<main class="admin-page">
+
+<section class="admin-card" id="loginCard">
+  <div class="admin-logo">NEXORA</div>
+  <p class="admin-label">PRIVATE STUDIO</p>
+  <h1>Accès sécurisé</h1>
+  <p class="admin-description">Entrez votre code administrateur pour ouvrir votre espace.</p>
+
+  <form id="loginForm">
+    <input id="adminCode" type="password" placeholder="CODE ADMINISTRATEUR" autocomplete="off" required>
+    <button type="submit" id="loginButton">Ouvrir le studio</button>
+  </form>
+
+  <div id="loginMessage"></div>
+</section>
+
+<section class="dashboard-card" id="dashboard" hidden>
+
+<header class="dashboard-header">
+  <div class="dashboard-brand">
+    <div class="brand-symbol">N</div>
+    <div>
+      <div class="admin-logo">NEXORA</div>
+      <p class="admin-label">PRIVATE STUDIO</p>
+    </div>
+  </div>
+  <button class="logout-btn" id="logoutButton">Déconnexion</button>
+</header>
+
+<div class="dashboard-body">
+
+<aside class="sidebar">
+  <button class="nav-button active" data-view="overview"><span class="nav-icon">⌂</span>Vue d'ensemble</button>
+  <button class="nav-button" data-view="create"><span class="nav-icon">＋</span>Créer</button>
+  <button class="nav-button" data-view="contents"><span class="nav-icon">▣</span>Contenus</button>
+  <button class="nav-button" data-view="admins" id="adminsNav"><span class="nav-icon">◉</span>Administrateurs</button>
+</aside>
+
+<section class="main-area">
+
+<div class="view active" id="view-overview">
+  <div class="page-heading">
+    <h1>Bonjour, bienvenue dans NEXORA.</h1>
+    <p>Votre espace de contrôle et de publication.</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-label">CONTENUS</div>
+      <div class="stat-value" id="statContents">—</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">ADMINISTRATEURS</div>
+      <div class="stat-value" id="statAdmins">—</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">ESPACE MÉDIA</div>
+      <div class="stat-value">ACTIF</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">Publication rapide</div>
+    <div class="panel-subtitle">Créez un nouveau contenu et rendez-le immédiatement accessible avec son code.</div>
+    <button class="action-button" style="width:auto;padding:13px 18px;border-radius:12px" onclick="showView('create')">
+      ＋ Nouveau contenu
+    </button>
+  </div>
+</div>
+
+<div class="view" id="view-create">
+  <div class="page-heading">
+    <h1>Nouveau contenu</h1>
+    <p>Construisez la fiche, importez vos fichiers puis générez le code d'accès.</p>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">Informations</div>
+    <div class="panel-subtitle">Ces informations seront présentées au visiteur avant ses téléchargements.</div>
+
+    <form id="contentForm">
+
+      <div class="field">
+        <label for="title">Titre</label>
+        <input id="title" type="text" placeholder="Ex. Mon film, mon album, mon manga..." required>
+      </div>
+
+      <div class="field">
+        <label for="description">Description / synopsis</label>
+        <textarea id="description" placeholder="Présentez clairement le contenu..."></textarea>
+      </div>
+
+      <div class="form-grid">
+        <div class="field">
+          <label for="type">Catégorie</label>
+          <select id="type" required>
+            <option value="">Choisir une catégorie</option>
+            <option value="film">Film</option>
+            <option value="serie">Série</option>
+            <option value="manga">Manga</option>
+            <option value="animation">Animation</option>
+            <option value="audio">Audio</option>
+            <option value="autre">Autre</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="coverUrl">Image de couverture</label>
+          <input id="coverUrl" type="file" accept="image/*">
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="file-upload-box">
+          <button type="button" class="file-upload-label" id="chooseFilesButton">
+            <strong>＋ Ajouter des fichiers</strong>
+            <span>Vidéo · Audio · Film · Manga · PDF · Image</span>
+            <small>Jusqu'à 20 fichiers · 500 MB maximum par fichier</small>
+          </button>
+
+          <input
+            id="mediaFiles"
+            type="file"
+            accept="video/*,audio/*,image/*,.pdf,.zip,.rar,.cbz,.cbr"
+            multiple
+            hidden
+          >
+
+          <div id="fileList" class="file-list">
+            <div class="muted">Aucun fichier sélectionné.</div>
+          </div>
+        </div>
+      </div>
+
+      <label class="checkbox-row">
+        <input id="hasExpiry" type="checkbox">
+        Définir une date d'expiration
+      </label>
+
+      <input id="expiresAt" type="datetime-local" disabled>
+
+      <button type="submit" id="createButton">Créer et publier</button>
+
+      <div id="contentMessage"></div>
+      <div id="createdCode"></div>
+
+    </form>
+  </div>
+</div>
+
+<div class="view" id="view-contents">
+  <div class="page-heading">
+    <h1>Bibliothèque</h1>
+    <p>Vos contenus publiés et leurs codes d'accès.</p>
+  </div>
+
+  <div class="panel">
+    <div id="contentList" class="content-list">
+      <p class="muted">Chargement...</p>
+    </div>
+  </div>
+</div>
+
+<div class="view" id="view-admins">
+  <div class="page-heading">
+    <h1>Administrateurs</h1>
+    <p>Gestion des accès secondaires. Cette section est réservée à l'Owner.</p>
+  </div>
+
+  <div class="panel">
+    <div id="adminsMessage" class="muted">Chargement...</div>
+    <div id="adminUsers" class="admin-users"></div>
+  </div>
+</div>
+
+</section>
+</div>
+</section>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+
+let currentSlot = null;
+
+function escapeHtml(value){
+  return String(value ?? '')
+    .replaceAll('&','&amp;')
+    .replaceAll('<','&lt;')
+    .replaceAll('>','&gt;')
+    .replaceAll('"','&quot;')
+    .replaceAll("'","&#039;");
+}
+
+function showView(name){
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-button').forEach(b => b.classList.remove('active'));
+
+  const view = $('view-' + name);
+  if(view) view.classList.add('active');
+
+  const button = document.querySelector('[data-view="' + name + '"]');
+  if(button) button.classList.add('active');
+
+  if(name === 'contents') loadContents();
+  if(name === 'admins') loadAdmins();
+}
+
+document.querySelectorAll('.nav-button').forEach(button => {
+  button.addEventListener('click', () => showView(button.dataset.view));
+});
+
+$('loginForm').addEventListener('submit', async event => {
+  event.preventDefault();
+
+  const code = $('adminCode').value.trim();
+
+  $('loginButton').disabled = true;
+  $('loginButton').textContent = 'Vérification...';
+  $('loginMessage').textContent = '';
+
+  try{
+    const response = await fetch('/api/admin/auth/login',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      credentials:'include',
+      body:JSON.stringify({code})
+    });
+
+    const data = await response.json();
+
+    if(!response.ok || !data.success){
+      $('loginMessage').textContent = data.message || 'Code invalide.';
+      $('loginMessage').className = 'error';
+      return;
+    }
+
+    currentSlot = data.slot;
+
+    $('loginCard').hidden = true;
+    $('dashboard').hidden = false;
+
+    if(currentSlot !== 'owner'){
+      $('adminsNav').hidden = true;
+    }
+
+    await loadContents();
+
+  }catch(error){
+    $('loginMessage').textContent = 'Impossible de contacter le serveur.';
+    $('loginMessage').className = 'error';
+  }finally{
+    $('loginButton').disabled = false;
+    $('loginButton').textContent = 'Ouvrir le studio';
+  }
+});
+
+$('logoutButton').addEventListener('click', async () => {
+  try{
+    await fetch('/api/admin/auth/logout',{
+      method:'POST',
+      credentials:'include'
+    });
+  }finally{
+    location.reload();
+  }
+});
+
+$('chooseFilesButton').addEventListener('click', () => {
+  $('mediaFiles').click();
+});
+
+$('mediaFiles').addEventListener('change', () => {
+  const files = Array.from($('mediaFiles').files);
+  const list = $('fileList');
+
+  if(!files.length){
+    list.innerHTML = '<div class="muted">Aucun fichier sélectionné.</div>';
+    return;
+  }
+
+  list.innerHTML = files.map(file => {
+    const size = (file.size / (1024 * 1024)).toFixed(2);
+    const type = file.type || 'type inconnu';
+
+    return '<div class="file-item">' +
+      '<strong>' + escapeHtml(file.name) + '</strong>' +
+      '<span>' + size + ' MB · ' + escapeHtml(type) + '</span>' +
+      '</div>';
+  }).join('');
+});
+
+$('hasExpiry').addEventListener('change', () => {
+  $('expiresAt').disabled = !$('hasExpiry').checked;
+});
+
+$('contentForm').addEventListener('submit', async event => {
+  event.preventDefault();
+
+  const files = $('mediaFiles').files;
+  const file = files[0] || null;
+
+  $('createButton').disabled = true;
+  $('createButton').textContent = file ? 'Importation...' : 'Publication...';
+  $('contentMessage').textContent = '';
+  $('createdCode').innerHTML = '';
+
+  try{
+
+    let fileKey = null;
+
+    if(files.length){
+      for(const selectedFile of files){
+        if(selectedFile.size > 500 * 1024 * 1024){
+        throw new Error('Le fichier dépasse la limite de 500 MB.');
+        }
+      }
+
+      const formData = new FormData();
+      for(const selectedFile of files){
+        formData.append('files', selectedFile);
+      }
+
+      const uploadResponse = await fetch('/api/admin/upload/media',{
+        method:'POST',
+        credentials:'include',
+        body:formData
+      });
+
+      const uploadData = await uploadResponse.json();
+
+      if(!uploadResponse.ok || !uploadData.success){
+        throw new Error(uploadData.message || 'Échec de l’importation.');
+      }
+
+      const uploadedFiles = uploadData.files || [];
+
+      if(!uploadedFiles.length){
+        throw new Error('Aucun fichier n’a été importé.');
+      }
+
+      fileKey = JSON.stringify(uploadedFiles);
+    }
+
+    if(!fileKey){
+      throw new Error('Ajoutez un fichier ou indiquez une référence de fichier.');
+    }
+
+    let coverUrl = null;
+    const coverFile = $('coverUrl').files[0] || null;
+
+    if(coverFile){
+      if(coverFile.size > 20 * 1024 * 1024){
+        throw new Error('La couverture dépasse la limite de 20 MB.');
+      }
+
+      const coverData = new FormData();
+      coverData.append('cover', coverFile);
+
+      const coverResponse = await fetch('/api/admin/upload/cover',{
+        method:'POST',
+        credentials:'include',
+        body:coverData
+      });
+
+      const coverResult = await coverResponse.json();
+
+      if(!coverResponse.ok || !coverResult.success){
+        throw new Error(coverResult.message || 'Échec de l’importation de la couverture.');
+      }
+
+      const publicResult = await fetch('/api/admin/upload/cover-url',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        credentials:'include',
+        body:JSON.stringify({file_key:coverResult.file_key})
+      });
+
+      const publicData = await publicResult.json();
+
+      if(!publicResult.ok || !publicData.success){
+        throw new Error(publicData.message || 'Impossible de préparer la couverture.');
+      }
+
+      coverUrl = publicData.url;
+    }
+
+    const payload = {
+      title:$('title').value.trim(),
+      description:$('description').value.trim(),
+      type:$('type').value,
+      cover_url:coverUrl,
+      file_key:fileKey,
+      expires_at:$('hasExpiry').checked && $('expiresAt').value
+        ? new Date($('expiresAt').value).toISOString()
+        : null
+    };
+
+    $('createButton').textContent = 'Création du contenu...';
+
+    const response = await fetch('/api/content/create',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      credentials:'include',
+      body:JSON.stringify(payload)
+    });
+
+    const data = await response.json();
+
+    if(!response.ok || !data.success){
+      throw new Error(data.message || 'Création impossible.');
+    }
+
+    $('contentMessage').textContent = 'Contenu publié avec succès.';
+    $('contentMessage').className = 'success';
+
+    $('createdCode').innerHTML = `
+      <div class="result-box">
+        <strong>Code d'accès généré</strong>
+        <div class="code-row">
+          <code id="newCode">${escapeHtml(data.code || '')}</code>
+          <button type="button" class="copy-btn" onclick="copyCode()">Copier</button>
+        </div>
+      </div>
+    `;
+
+    $('contentForm').reset();
+    $('expiresAt').disabled = true;
+
+    await loadContents();
+
+  }catch(error){
+    $('contentMessage').textContent = error.message;
+    $('contentMessage').className = 'error';
+  }finally{
+    $('createButton').disabled = false;
+    $('createButton').textContent = 'Créer et publier';
+  }
+});
+
+async function loadContents(){
+  try{
+    const response = await fetch('/api/admin/dashboard',{
+      credentials:'include'
+    });
+
+    const data = await response.json();
+
+    if(!response.ok || !data.success){
+      $('contentList').innerHTML =
+        '<p class="error">Impossible de charger les contenus.</p>';
+      return;
+    }
+
+    $('statContents').textContent = data.contents.length;
+
+    if(!data.contents.length){
+      $('contentList').innerHTML =
+        '<p class="muted">Aucun contenu pour le moment.</p>';
+      return;
+    }
+
+    $('contentList').innerHTML = data.contents.map(content => `
+      <article class="content-item">
+        <div class="content-item-main">
+          <strong>${escapeHtml(content.title)}</strong>
+          <span class="content-type">${escapeHtml(content.type)}</span>
+        </div>
+        <code>${escapeHtml(content.code)}</code>
+        <span class="content-status">
+          ${content.available ? '● Disponible' : '● Indisponible'}
+        </span>
+      </article>
+    `).join('');
+
+  }catch(error){
+    $('contentList').innerHTML =
+      '<p class="error">Erreur de connexion.</p>';
+  }
+}
+
+async function loadAdmins(){
+  if(currentSlot !== 'owner') return;
+
+  $('adminsMessage').textContent = 'Chargement...';
+
+  try{
+    const response = await fetch('/api/admin/admins',{
+      credentials:'include'
+    });
+
+    const data = await response.json();
+
+    if(!response.ok || !data.success){
+      throw new Error(data.message || 'Impossible de charger les administrateurs.');
+    }
+
+    const admins = data.admins || [];
+
+    $('statAdmins').textContent =
+      admins.filter(a => a.active).length + '/2';
+
+    $('adminUsers').innerHTML = admins.map(admin => `
+      <article class="admin-user">
+        <div class="admin-user-head">
+          <h3>${admin.slot === 'admin2' ? 'Admin 2' : 'Admin 3'}</h3>
+          <span class="badge ${admin.active ? 'on' : 'off'}">
+            ${admin.active ? 'ACTIF' : 'INACTIF'}
+          </span>
+        </div>
+
+        <p class="muted">
+          ${admin.lastGeneratedAt
+            ? 'Dernier code généré : ' +
+              new Date(admin.lastGeneratedAt).toLocaleString('fr-FR')
+            : 'Aucun code généré.'}
+        </p>
+
+        <div class="admin-actions">
+          <button class="primary-action"
+            onclick="generateAdminCode('${admin.slot}')">
+            Générer un code
+          </button>
+
+          <button
+            onclick="toggleAdmin('${admin.slot}', ${!admin.active})">
+            ${admin.active ? 'Désactiver' : 'Activer'}
+          </button>
+        </div>
+
+        <div id="code-${admin.slot}"></div>
+      </article>
+    `).join('');
+
+    $('adminsMessage').textContent =
+      'L’Owner contrôle ici les deux accès secondaires.';
+
+  }catch(error){
+    $('adminsMessage').textContent = error.message;
+    $('adminsMessage').className = 'error';
+  }
+}
+
+async function generateAdminCode(slot){
+  try{
+    const response = await fetch(
+      '/api/admin/admins/' + slot + '/generate',
+      {
+        method:'POST',
+        credentials:'include'
+      }
+    );
+
+    const data = await response.json();
+
+    if(!response.ok || !data.success){
+      throw new Error(data.message || 'Génération impossible.');
+    }
+
+    $('code-' + slot).innerHTML = `
+      <div class="admin-code">
+        Nouveau code : <strong>${escapeHtml(data.code)}</strong>
+        <button
+          type="button"
+          class="copy-btn"
+          style="float:right"
+          onclick="navigator.clipboard.writeText('${escapeHtml(data.code)}')">
+          Copier
+        </button>
+      </div>
+    `;
+
+    await loadAdmins();
+
+    $('code-' + slot).innerHTML += `
+      <div class="admin-code">
+        Nouveau code : <strong>${escapeHtml(data.code)}</strong>
+      </div>
+    `;
+
+  }catch(error){
+    alert(error.message);
+  }
+}
+
+async function toggleAdmin(slot, active){
+  try{
+    const response = await fetch(
+      '/api/admin/admins/' + slot + '/status',
+      {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        credentials:'include',
+        body:JSON.stringify({active})
+      }
+    );
+
+    const data = await response.json();
+
+    if(!response.ok || !data.success){
+      throw new Error(data.message || 'Modification impossible.');
+    }
+
+    await loadAdmins();
+
+  }catch(error){
+    alert(error.message);
+  }
+}
+
+function copyCode(){
+  const code = $('newCode')?.textContent;
+
+  if(code){
+    navigator.clipboard.writeText(code);
+  }
+}
+</script>
+
+</body>
+</html>
